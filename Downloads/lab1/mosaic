@@ -1,0 +1,169 @@
+const upload = document.getElementById("upload")
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let nodeHeight = 15;
+let padding = 5;
+
+const textDB = [
+    "poop",
+    "fart",
+    "monkey",
+    "database",
+    "sql",
+    "extravagant",
+    "computer",
+    "mouse",
+    "stage",
+    "egg",
+    "armature",
+    "scaffolding",
+    "odometry"
+]
+
+upload.addEventListener("change", function(event)){
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    const imageURL = URL.createObjectURL(file);
+
+    uploadedImage.onload = function() {
+        generateMosaic();
+            URL.revokeObjectURL(imageURL);
+        };
+
+    uploadedImage.src = imageURL;
+
+};
+
+function generateMosaic() {
+    maxWidth = 1000;
+    const scale = Math.min(1, maxWidth / uploadedImage.width);
+
+    canvas.width = Math.round(uploadedImage.width * scale);
+    canvas.height = Math.round(uploadedImage.height * scale);
+
+    const sampleCanvas = document.createElement("canvas");
+
+    sampleCanvas.width = canvas.width;
+    sampleCanvas.height = canvas.height;
+
+    const sampleCtx = sampleCanvas.getContext("2d", {
+        willReadFrequently: true
+    });
+
+    sampleCtx.drawImage(
+        uploadedImage,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const imageData = sampleCtx.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const pixels = imageData.data;
+
+    ctx.font = `${FONT_SIZE}px Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    let x = 0;
+    let y = 0;
+
+    while (y + nodeHeight <= canvas.height){
+        const word = getRandomWord();
+
+        const textWidth = ctx.measureText(word).width;
+
+        const totalWidth = textWidth + padding * 2;
+
+        const cutoff = canvas.width - x;
+
+        const nodeWith = Math.min(totalWidth, cutoff);
+
+        const color = getAverageColour(
+            pixels, canvas.width, x, y, nodeWith, nodeHeight
+            
+        );
+
+        const brightness = (
+            color.r * 299 +
+            color.g * 587 +
+            color.b * 144
+        ) / 1000;
+
+        ctx.fillStyle = 'rgb(${color.r},${color.g},${color.b})';
+
+        ctx.fillRect( x, y, nodeWidth, nodeHeight);
+
+        ctx.fillStyle = brightness > 140 ? "#111111" : "#ffffff";
+
+        ctx.fillText(
+            word,
+            x + nodeWidth / 2,
+            y + nodeHeight / 2,
+            Math.max(1, nodeWith - 4);
+        );
+
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.lineWidth = 1;
+
+        ctx.strokeRect( x, y, nodeWidth, nodeHeight);
+
+        x += nodeWidth;
+
+        if(x >= canvas.width) {
+            x = 0;
+            y += nodeHeight;
+        }
+    }
+}
+//measure pixels word uses
+function measureText(){
+
+}
+//getrandomword lol
+function getRandomWord(){
+    const index = Math.floor(Math.random() * textDB.length);
+    return textDB[index];
+}
+
+function getAverageCoor(pixels, imageWidth, x, y, width, height){
+
+    let red = 0;
+    let green = 0;
+    let blue = 0;
+    let count = 0;
+
+    for(let py = y; py < y + height; py++){
+        for(let px = x; px < x + width; px++){
+            const index = (py * imageWidth + px) * 4;
+
+            red += pixels[index];
+            green += pixels[index + 1];
+            blue += pixels[index + 2];
+
+            count++;
+        }
+    }
+    return {
+        r: Math.round(red / count),
+        g: Math.round(green / count),
+        b: Math.round(blue / count),
+        
+    }
+}
