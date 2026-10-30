@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Mosaic Generator</title>
+
+    <style>
+        body {
+            background: #181818;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            background: #222;
+            border: 1px solid #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Image Mosaic Generator</h1>
+
+    <div class="controls">
+        <input type="file" id="imageUpload" accept="image/*">
+
+        <label>
+            Node size:
+            <input type="range" id="nodeSize" min="10" max="60" value="25">
+            <span id="sizeValue">25</span>
+        </label>
+    </div>
+
+    <canvas id="mosaicCanvas"></canvas>
+
+    <script src="./mosaic.js" defer></script>
+
+</body>
+</html>
